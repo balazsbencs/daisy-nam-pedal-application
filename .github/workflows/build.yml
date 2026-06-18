@@ -1,12 +1,46 @@
-name: Build
+name: Build & Release
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
   workflow_dispatch:
 
 jobs:
+  # ── Create a draft GitHub release ──────────────────────────────────────────
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create.outputs.release_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: nam-platform-app
+
+      - name: Create draft release
+        id: create
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const config = JSON.parse(
+              fs.readFileSync('nam-platform-app/src-tauri/tauri.conf.json')
+            );
+            const version = config.version;
+            const shortSha = context.sha.slice(0, 7);
+            const tag = `v${version}-${shortSha}`;
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `NAM Platform v${version} (${shortSha})`,
+              body: `Built from commit ${context.sha}`,
+              draft: true,
+            });
+            core.setOutput('release_id', data.id.toString());
+
+  # ── Per-platform builds ─────────────────────────────────────────────────────
   build:
+    needs: create-release
     strategy:
       fail-fast: false
       matrix:
@@ -86,7 +120,6 @@ jobs:
           cp "$SRC" "$DEST"
 
       # ── dfu-util sidecar ─────────────────────────────────────────────────────
-      # macOS: pull from Homebrew and rename to the expected triple
       - name: Stage dfu-util sidecar (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -94,17 +127,23 @@ jobs:
           cp "$(which dfu-util)" \
              "nam-platform-app/src-tauri/binaries/dfu-util-${{ matrix.target }}"
 
-      # Windows: download the prebuilt libusb/dfu-util release
+      # Install dfu-util via MSYS2/MinGW64 — the reliable package-managed route.
+      # NOTE: libusb-1.0.dll must be distributed alongside the app on Windows;
+      # add it to tauri.conf.json bundle.resources once the installer is set up.
+      - name: Install dfu-util via MSYS2 (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          install: mingw-w64-x86_64-dfu-util
+
       - name: Stage dfu-util sidecar (Windows)
         if: runner.os == 'Windows'
-        shell: pwsh
+        shell: bash
         run: |
-          $url = "https://github.com/libusb/libusb/releases/download/v1.0.27/libusb-1.0.27.7z"
-          Invoke-WebRequest $url -OutFile libusb.7z
-          7z x libusb.7z -olibusb -y
-          # dfu-util ships its own zip separately; use the community Windows build
-          $dfu = "https://github.com/nicowillis/dfu-util-windows/releases/latest/download/dfu-util.exe"
-          Invoke-WebRequest $dfu -OutFile "nam-platform-app/src-tauri/binaries/dfu-util-${{ matrix.target }}.exe"
+          cp /mingw64/bin/dfu-util.exe \
+             "nam-platform-app/src-tauri/binaries/dfu-util-${{ matrix.target }}.exe"
 
       # ── Tauri build ──────────────────────────────────────────────────────────
       - name: Install npm dependencies
@@ -116,6 +155,7 @@ jobs:
         with:
           projectPath: nam-platform-app
           args: --target ${{ matrix.target }}
+          releaseId: ${{ needs.create-release.outputs.release_id }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # macOS code signing — set these secrets in your repo settings:
@@ -123,3 +163,19 @@ jobs:
           # APPLE_CERTIFICATE_PASSWORD .p12 password
           # APPLE_SIGNING_IDENTITY     "Developer ID Application: ..."
           # APPLE_ID / APPLE_PASSWORD / APPLE_TEAM_ID  for notarisation
+
+  # ── Publish release once all builds succeed ─────────────────────────────────
+  publish-release:
+    needs: [create-release, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ needs.create-release.outputs.release_id }},
+              draft: false,
+            });
