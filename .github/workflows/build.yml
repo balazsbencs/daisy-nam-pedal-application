@@ -49,10 +49,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest   # Apple Silicon (macos-15)
+          - os: macos-latest
             target: aarch64-apple-darwin
-          - os: macos-13       # Intel (last Intel GitHub runner)
-            target: x86_64-apple-darwin
           - os: windows-latest
             target: x86_64-pc-windows-msvc
 
@@ -146,7 +144,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          cp /mingw64/bin/dfu-util.exe \
+          cp "C:/msys64/mingw64/bin/dfu-util.exe" \
              "nam-platform-app/src-tauri/binaries/dfu-util-${{ matrix.target }}.exe"
 
       # ── Tauri build ──────────────────────────────────────────────────────────
