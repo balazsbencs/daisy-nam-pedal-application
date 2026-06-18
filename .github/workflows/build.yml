@@ -25,15 +25,20 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=$(python3 -c "import json; print(json.load(open('nam-platform-app/src-tauri/tauri.conf.json'))['version'])")
+          VERSION=$(jq -r '.version' nam-platform-app/src-tauri/tauri.conf.json)
           SHORT_SHA="${GITHUB_SHA:0:7}"
           TAG="v${VERSION}-${SHORT_SHA}"
-          gh release create "$TAG" \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "NAM Platform v${VERSION} (${SHORT_SHA})" \
-            --notes "Built from commit ${GITHUB_SHA}" \
-            --draft
-          RELEASE_ID=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq '.id')
+          # Use the API directly so we get the release ID back without a second
+          # lookup — gh api /releases/tags/{tag} 404s on draft releases because
+          # the git tag hasn't been created yet.
+          RESPONSE=$(gh api \
+            --method POST \
+            "repos/${GITHUB_REPOSITORY}/releases" \
+            -f tag_name="$TAG" \
+            -f name="NAM Platform v${VERSION} (${SHORT_SHA})" \
+            -f body="Built from commit ${GITHUB_SHA}" \
+            -F draft=true)
+          RELEASE_ID=$(echo "$RESPONSE" | jq -r '.id')
           echo "release_id=${RELEASE_ID}" >> "$GITHUB_OUTPUT"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
