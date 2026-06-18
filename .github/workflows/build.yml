@@ -142,9 +142,9 @@ jobs:
 
       - name: Stage dfu-util sidecar (Windows)
         if: runner.os == 'Windows'
-        shell: bash
+        shell: msys2 {0}
         run: |
-          cp "C:/msys64/mingw64/bin/dfu-util.exe" \
+          cp /mingw64/bin/dfu-util.exe \
              "nam-platform-app/src-tauri/binaries/dfu-util-${{ matrix.target }}.exe"
 
       # ── Tauri build ──────────────────────────────────────────────────────────
