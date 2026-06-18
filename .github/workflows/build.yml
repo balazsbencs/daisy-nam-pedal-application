@@ -1,0 +1,125 @@
+name: Build
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest   # Apple Silicon (macos-15)
+            target: aarch64-apple-darwin
+          - os: macos-13       # Intel (last Intel GitHub runner)
+            target: x86_64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # ── Checkouts ────────────────────────────────────────────────────────────
+      - name: Checkout nam-platform-app
+        uses: actions/checkout@v4
+        with:
+          path: nam-platform-app
+
+      - name: Checkout nam-binary-loader
+        uses: actions/checkout@v4
+        with:
+          repository: tone-3000/nam-binary-loader
+          path: nam-binary-loader
+
+      # NeuralAmpModelerCore ships Eigen + nlohmann as submodules
+      - name: Checkout NeuralAmpModelerCore
+        uses: actions/checkout@v4
+        with:
+          repository: sdatkinson/NeuralAmpModelerCore
+          submodules: recursive
+          path: NeuralAmpModelerCore
+
+      # ── Toolchains ───────────────────────────────────────────────────────────
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: nam-platform-app/package-lock.json
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      # Rust build cache — speeds up incremental Tauri recompiles on CI
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: nam-platform-app/src-tauri -> target
+
+      # ── Build nam2namb ────────────────────────────────────────────────────────
+      - name: Configure nam2namb (CMake)
+        working-directory: nam-binary-loader
+        run: >
+          cmake -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DNAM_CORE_PATH=${{ github.workspace }}/NeuralAmpModelerCore
+
+      - name: Build nam2namb
+        working-directory: nam-binary-loader
+        run: cmake --build build --config Release --target nam2namb
+
+      # MSVC puts the binary in build/Release/; single-config generators use build/
+      - name: Stage nam2namb sidecar
+        shell: bash
+        run: |
+          if [[ "${{ matrix.target }}" == *windows* ]]; then
+            SRC="nam-binary-loader/build/Release/nam2namb.exe"
+            DEST="nam-platform-app/src-tauri/binaries/nam2namb-${{ matrix.target }}.exe"
+          else
+            SRC="nam-binary-loader/build/nam2namb"
+            DEST="nam-platform-app/src-tauri/binaries/nam2namb-${{ matrix.target }}"
+          fi
+          cp "$SRC" "$DEST"
+
+      # ── dfu-util sidecar ─────────────────────────────────────────────────────
+      # macOS: pull from Homebrew and rename to the expected triple
+      - name: Stage dfu-util sidecar (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install dfu-util
+          cp "$(which dfu-util)" \
+             "nam-platform-app/src-tauri/binaries/dfu-util-${{ matrix.target }}"
+
+      # Windows: download the prebuilt libusb/dfu-util release
+      - name: Stage dfu-util sidecar (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $url = "https://github.com/libusb/libusb/releases/download/v1.0.27/libusb-1.0.27.7z"
+          Invoke-WebRequest $url -OutFile libusb.7z
+          7z x libusb.7z -olibusb -y
+          # dfu-util ships its own zip separately; use the community Windows build
+          $dfu = "https://github.com/nicowillis/dfu-util-windows/releases/latest/download/dfu-util.exe"
+          Invoke-WebRequest $dfu -OutFile "nam-platform-app/src-tauri/binaries/dfu-util-${{ matrix.target }}.exe"
+
+      # ── Tauri build ──────────────────────────────────────────────────────────
+      - name: Install npm dependencies
+        working-directory: nam-platform-app
+        run: npm ci
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        with:
+          projectPath: nam-platform-app
+          args: --target ${{ matrix.target }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # macOS code signing — set these secrets in your repo settings:
+          # APPLE_CERTIFICATE          base64-encoded .p12
+          # APPLE_CERTIFICATE_PASSWORD .p12 password
+          # APPLE_SIGNING_IDENTITY     "Developer ID Application: ..."
+          # APPLE_ID / APPLE_PASSWORD / APPLE_TEAM_ID  for notarisation

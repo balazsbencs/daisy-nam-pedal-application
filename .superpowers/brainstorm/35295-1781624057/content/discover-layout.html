@@ -1,0 +1,115 @@
+<h2>Design — Section 3: Discover Page Layout</h2>
+<p class="subtitle">Two layout options for the tone3000 browser. Which feels better?</p>
+
+<div class="split">
+  <div class="mockup" data-choice="a" onclick="toggleSelect(this)" style="cursor:pointer;">
+    <div class="mockup-header">A — Search + Grid (tone cards)</div>
+    <div class="mockup-body" style="font-size:11px;">
+
+      <!-- top bar: search + filters -->
+      <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <div style="flex:1;background:#0d0d0d;border:1px solid #333;border-radius:5px;padding:5px 8px;color:#555;">🔍 Search amps, pedals…</div>
+        <div style="background:#0d0d0d;border:1px solid #333;border-radius:5px;padding:5px 8px;color:#888;">Gear ▾</div>
+        <div style="background:#0d0d0d;border:1px solid #333;border-radius:5px;padding:5px 8px;color:#888;">Sort ▾</div>
+      </div>
+
+      <!-- tone cards grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+        <!-- card 1 -->
+        <div style="background:#111;border:1px solid #222;border-radius:7px;padding:10px;">
+          <div style="font-size:12px;font-weight:600;color:#ddd;margin-bottom:2px;">Fender Twin Reverb</div>
+          <div style="font-size:10px;color:#555;margin-bottom:6px;">by tonehunter · amp</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10px;color:#666;">↓ 1.2k · ♥ 340</span>
+            <div style="background:#6d28d9;border-radius:4px;padding:3px 8px;color:#fff;font-size:10px;cursor:pointer;">Get</div>
+          </div>
+        </div>
+        <!-- card 2 -->
+        <div style="background:#111;border:1px solid #222;border-radius:7px;padding:10px;">
+          <div style="font-size:12px;font-weight:600;color:#ddd;margin-bottom:2px;">Marshall JCM800</div>
+          <div style="font-size:10px;color:#555;margin-bottom:6px;">by ampfarm · amp</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10px;color:#666;">↓ 980 · ♥ 210</span>
+            <div style="background:#6d28d9;border-radius:4px;padding:3px 8px;color:#fff;font-size:10px;cursor:pointer;">Get</div>
+          </div>
+        </div>
+        <!-- card 3 -->
+        <div style="background:#111;border:1px solid #222;border-radius:7px;padding:10px;">
+          <div style="font-size:12px;font-weight:600;color:#ddd;margin-bottom:2px;">Vox AC30</div>
+          <div style="font-size:10px;color:#555;margin-bottom:6px;">by britishtone · amp</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10px;color:#666;">↓ 750 · ♥ 190</span>
+            <div style="background:#6d28d9;border-radius:4px;padding:3px 8px;color:#fff;font-size:10px;cursor:pointer;">Get</div>
+          </div>
+        </div>
+        <!-- card 4 -->
+        <div style="background:#111;border:1px solid #222;border-radius:7px;padding:10px;">
+          <div style="font-size:12px;font-weight:600;color:#ddd;margin-bottom:2px;">Mesa Boogie Dual Rec</div>
+          <div style="font-size:10px;color:#555;margin-bottom:6px;">by heavytones · amp</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10px;color:#666;">↓ 1.5k · ♥ 420</span>
+            <div style="background:#6d28d9;border-radius:4px;padding:3px 8px;color:#fff;font-size:10px;cursor:pointer;">Get</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- pagination hint -->
+      <div style="text-align:center;color:#444;font-size:10px;margin-top:8px;">Load more…</div>
+    </div>
+  </div>
+
+  <div class="mockup" data-choice="b" onclick="toggleSelect(this)" style="cursor:pointer;">
+    <div class="mockup-header">B — Master/Detail (list + side panel)</div>
+    <div class="mockup-body" style="font-size:11px;display:flex;gap:0;padding:0;">
+
+      <!-- left list -->
+      <div style="width:55%;border-right:1px solid #222;padding:10px;">
+        <div style="background:#0d0d0d;border:1px solid #333;border-radius:5px;padding:5px 8px;color:#555;margin-bottom:8px;">🔍 Search…</div>
+        <div style="display:flex;gap:4px;margin-bottom:8px;">
+          <div style="background:#6d28d9;border-radius:4px;padding:2px 6px;color:#fff;font-size:9px;">All</div>
+          <div style="background:#1a1a1a;border:1px solid #333;border-radius:4px;padding:2px 6px;color:#666;font-size:9px;">Amp</div>
+          <div style="background:#1a1a1a;border:1px solid #333;border-radius:4px;padding:2px 6px;color:#666;font-size:9px;">Pedal</div>
+        </div>
+        <!-- list rows -->
+        <div style="background:#1a1a2e;border:1px solid #4c1d95;border-radius:5px;padding:7px 8px;margin-bottom:4px;">
+          <div style="color:#ddd;font-size:11px;font-weight:600;">Fender Twin Reverb</div>
+          <div style="color:#555;font-size:9px;">tonehunter · amp · ↓ 1.2k</div>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:5px;padding:7px 8px;margin-bottom:4px;">
+          <div style="color:#bbb;font-size:11px;">Marshall JCM800</div>
+          <div style="color:#555;font-size:9px;">ampfarm · amp · ↓ 980</div>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:5px;padding:7px 8px;margin-bottom:4px;">
+          <div style="color:#bbb;font-size:11px;">Vox AC30</div>
+          <div style="color:#555;font-size:9px;">britishtone · amp · ↓ 750</div>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:5px;padding:7px 8px;">
+          <div style="color:#bbb;font-size:11px;">Mesa Boogie Dual Rec</div>
+          <div style="color:#555;font-size:9px;">heavytones · amp · ↓ 1.5k</div>
+        </div>
+      </div>
+
+      <!-- right detail panel -->
+      <div style="flex:1;padding:10px;">
+        <div style="font-size:13px;font-weight:600;color:#ddd;margin-bottom:2px;">Fender Twin Reverb</div>
+        <div style="font-size:10px;color:#555;margin-bottom:8px;">by tonehunter · amp · ↓ 1.2k · ♥ 340</div>
+        <div style="font-size:10px;color:#777;margin-bottom:10px;line-height:1.5;">Clean Fender Twin with spring reverb. Captured at 44.1 kHz. Standard architecture.</div>
+        <div style="font-size:10px;color:#555;margin-bottom:2px;">Available models:</div>
+        <div style="background:#0d0d0d;border:1px solid #222;border-radius:4px;padding:5px 7px;margin-bottom:3px;display:flex;justify-content:space-between;">
+          <span style="color:#aaa;">Standard (v2)</span>
+          <span style="color:#555;">48 KB</span>
+        </div>
+        <div style="background:#0d0d0d;border:1px solid #222;border-radius:4px;padding:5px 7px;margin-bottom:10px;display:flex;justify-content:space-between;">
+          <span style="color:#aaa;">Lite</span>
+          <span style="color:#555;">12 KB</span>
+        </div>
+        <div style="background:#6d28d9;border-radius:5px;padding:7px;text-align:center;color:#fff;font-size:11px;font-weight:500;cursor:pointer;">↓ Download &amp; Import</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:12px;font-size:12px;color:#666;">
+  <strong style="color:#888;">A — Grid:</strong> Compact, scannable. Good for discovery and browsing many tones at once. "Get" button inline per card.<br>
+  <strong style="color:#888;">B — Master/Detail:</strong> More info per tone (description, model variants) before committing to download. Better for informed decisions.
+</div>

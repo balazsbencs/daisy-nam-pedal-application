@@ -1,0 +1,81 @@
+<h2>Design — Section 5: Download States</h2>
+<p class="subtitle">States of the detail panel's action area during and after download.</p>
+
+<div class="split">
+
+  <div class="mockup">
+    <div class="mockup-header">Idle → Downloading → Done</div>
+    <div class="mockup-body" style="display:flex;flex-direction:column;gap:14px;">
+
+      <!-- Idle -->
+      <div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Idle</div>
+        <div style="background:#6d28d9;border-radius:6px;padding:9px;text-align:center;color:#fff;font-size:12px;font-weight:500;">↓ Download &amp; Import</div>
+        <div style="text-align:center;font-size:9px;color:#444;margin-top:4px;">Converts to .namb · adds to Library</div>
+      </div>
+
+      <!-- Downloading -->
+      <div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Downloading</div>
+        <div style="background:#3b1f6b;border-radius:6px;padding:9px;text-align:center;color:#a78bfa;font-size:12px;cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <span style="display:inline-block;">⟳</span> Downloading…
+        </div>
+        <div style="height:3px;background:#1e1e1e;border-radius:2px;margin-top:6px;overflow:hidden;">
+          <div style="height:3px;width:60%;background:linear-gradient(90deg,#6d28d9,#a78bfa);border-radius:2px;"></div>
+        </div>
+      </div>
+
+      <!-- Converting -->
+      <div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Converting</div>
+        <div style="background:#3b1f6b;border-radius:6px;padding:9px;text-align:center;color:#a78bfa;font-size:12px;cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <span>⟳</span> Converting to .namb…
+        </div>
+      </div>
+
+      <!-- Done -->
+      <div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Done (toast fires, button changes)</div>
+        <div style="background:#14532d;border:1px solid #166534;border-radius:6px;padding:9px;text-align:center;color:#86efac;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+          ✓ In Library
+        </div>
+        <div style="text-align:center;font-size:9px;color:#444;margin-top:4px;">Toast: "Imported 'Fender Deluxe Reverb'"</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Edge cases</div>
+    <div class="mockup-body" style="display:flex;flex-direction:column;gap:14px;">
+
+      <!-- Already in library -->
+      <div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Already imported</div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:6px;padding:9px;text-align:center;color:#888;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+          ✓ In Library
+          <span style="color:#6d28d9;font-size:10px;text-decoration:underline;cursor:pointer;margin-left:4px;">Re-import</span>
+        </div>
+        <div style="text-align:center;font-size:9px;color:#444;margin-top:4px;">Detected by matching tone ID in stored models</div>
+      </div>
+
+      <!-- Conversion error -->
+      <div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Conversion error</div>
+        <div style="background:#1a1a1a;border:1px solid #7f1d1d;border-radius:6px;padding:9px;text-align:center;color:#f87171;font-size:12px;">✗ Conversion failed</div>
+        <div style="text-align:center;font-size:9px;color:#7f1d1d;margin-top:4px;">Toast: error message from nam2namb stderr</div>
+        <div style="background:#6d28d9;border-radius:6px;padding:6px;text-align:center;color:#fff;font-size:11px;margin-top:6px;cursor:pointer;">Retry</div>
+      </div>
+
+      <!-- Network error -->
+      <div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Network / auth error</div>
+        <div style="background:#1a1a1a;border:1px solid #7f1d1d;border-radius:6px;padding:9px;text-align:center;color:#f87171;font-size:12px;">✗ Download failed</div>
+        <div style="text-align:center;font-size:9px;color:#7f1d1d;margin-top:4px;">Toast: "Session expired — please sign in again" if 401</div>
+        <div style="background:#6d28d9;border-radius:6px;padding:6px;text-align:center;color:#fff;font-size:11px;margin-top:6px;cursor:pointer;">Retry</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,80 @@
+<h2>Design — Section 2: .nam Import Flow</h2>
+<p class="subtitle">When the user clicks "Import .nam or .namb", a two-step flow for .nam files. Does this feel right?</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Library → Models tab (updated button)</div>
+    <div class="mockup-body">
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px;">
+        <mock-btn style="background:#1a1a2e;color:#aaa;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;display:inline-block;">↑ Import .nam / .namb</mock-btn>
+        <mock-btn style="background:#1a1a2e;color:#aaa;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;display:inline-block;">🌐 Browse tone3000</mock-btn>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="color:#888;">♪</span>
+            <div>
+              <div style="font-size:13px;color:#ddd;">Fender Twin</div>
+              <div style="font-size:11px;color:#555;">48.2 KB</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:8px;padding:12px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="color:#888;">♪</span>
+            <div>
+              <div style="font-size:13px;color:#ddd;">Marshall JCM800</div>
+              <div style="font-size:11px;color:#555;">51.7 KB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Slim factor dialog (shown when .nam selected)</div>
+    <div class="mockup-body">
+      <div style="background:#111;border:1px solid #333;border-radius:10px;padding:20px;max-width:340px;margin:0 auto;">
+        <div style="font-size:14px;font-weight:600;color:#eee;margin-bottom:4px;">Convert "my-model.nam"</div>
+        <div style="font-size:12px;color:#666;margin-bottom:20px;">Choose model quality. Higher quality uses more CPU on the device.</div>
+
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:6px;">
+            <span>Quality</span>
+            <span style="color:#a78bfa;font-weight:600;">High (1.0)</span>
+          </div>
+          <div style="position:relative;height:4px;background:#222;border-radius:2px;">
+            <div style="position:absolute;left:0;top:0;height:4px;width:100%;background:linear-gradient(90deg,#6d28d9,#a78bfa);border-radius:2px;"></div>
+            <div style="position:absolute;right:-6px;top:-4px;width:12px;height:12px;background:#a78bfa;border-radius:50%;border:2px solid #1a1a1a;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:#555;margin-top:6px;">
+            <span>Low (0.0)</span>
+            <span>High (1.0)</span>
+          </div>
+        </div>
+
+        <div style="background:#0d0d0d;border:1px solid #222;border-radius:6px;padding:10px;margin-bottom:16px;font-size:11px;color:#666;">
+          <span style="color:#888;">ℹ</span>  Slim factor only applies to SlimmableContainer models. For standard models it is ignored automatically.
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:7px 14px;font-size:12px;color:#888;cursor:pointer;">Cancel</div>
+          <div style="background:#6d28d9;border-radius:6px;padding:7px 14px;font-size:12px;color:#fff;cursor:pointer;font-weight:500;">Convert &amp; Import</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px;">
+  <h3>Flow summary</h3>
+  <ol style="color:#aaa;font-size:13px;line-height:1.8;padding-left:20px;">
+    <li>User clicks <strong style="color:#ddd;">"Import .nam / .namb"</strong> — file picker opens, accepts both extensions</li>
+    <li>If <strong style="color:#ddd;">.namb</strong> selected → import directly (existing behavior)</li>
+    <li>If <strong style="color:#ddd;">.nam</strong> selected → slim factor dialog appears (pre-set to 1.0)</li>
+    <li>User adjusts slider if desired, clicks <strong style="color:#ddd;">"Convert &amp; Import"</strong></li>
+    <li>Rust runs <code style="color:#a78bfa;">nam2namb --slim &lt;factor&gt; input.nam</code> sidecar, places result in library</li>
+    <li>Toast: <em style="color:#ddd;">"Imported 'my-model' (converted from .nam)"</em></li>
+  </ol>
+</div>
